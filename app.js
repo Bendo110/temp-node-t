@@ -1,19 +1,16 @@
-//npm - global command, comes with node
+var http = require('http')
+var fs = require('fs')
 
-//local dependency - use it only in this particular project
-//npm i <packageName>
-
-//global dependecy - use it in any project
-//npm install -g <packageName>
-
-//packace.json - manifest file (stores important info about project/package)'
-//manual approach (create package.json in the root, create properties etc)
-//npm init (step by step, press enter to skip)
-//nom init -y (everything default) 
-
-const _ = require('lodash')
-
-const items = [1, [2, [3, [4]]]]
-const newItems = _.flattenDeep(items)
-console.log(newItems)
-console.log('hello world')
+http
+    .createServer(function (req, res) {
+        // const text = fs.readFileSync('./content/big.txt', 'utf-8')
+        // res.end(text)
+        const fileStream = fs.createReadStream('./content/big.txt', 'utf-8')
+        fileStream.on('open', () => {
+            fileStream.pipe(res) //pushing from the read stream into the write stream, instead of sending the file in one large instance we are sending it back into chunked
+        })
+        fileStream.on('error', (err) => {
+            res.end(err)
+        })
+    })
+    .listen(5000)
